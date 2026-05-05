@@ -55,6 +55,7 @@ public class UserStatsActivity extends AppCompatActivity {
         bindTierProgress(stats.totalWorkouts);
 
         setText(R.id.txtTotalWorkoutsValue, String.valueOf(stats.totalWorkouts));
+        setText(R.id.txtTotalVolumeValue, stats.totalVolumeLabel);
         setText(R.id.txtTotalSetsValue, String.valueOf(stats.totalSets));
         setText(R.id.txtTotalRepsValue, String.valueOf(stats.totalReps));
         setText(R.id.txtDistinctExercisesValue, String.valueOf(stats.distinctExercises));
