@@ -434,11 +434,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Map<String, Integer> categoryCounts = new LinkedHashMap<>();
         Set<String> activeDateKeys = new LinkedHashSet<>();
 
+        // Optimization: load the category map once
+        Map<String, List<String>> categoryMap = DataLoader.getExerciseNameToCategoriesMap(appContext);
+
         Calendar now = Calendar.getInstance();
         Date newestWorkoutDate = null;
         Date oldestWorkoutDate = null;
         double heaviestWeight = Double.NEGATIVE_INFINITY;
-        String heaviestExercise = null;
+        String heaviestExercise = "";
         int heaviestReps = 0;
         int heaviestSets = 0;
 
@@ -492,9 +495,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     heaviestSets = sets;
                 }
 
+                if (weight > 0 && reps > 0 && sets > 0) {
+                    summary.totalVolume += (weight * reps * sets);
+                }
+
                 List<String> categories = DataLoader.parseCategoryCsv(exerciseGroup);
                 if ((exerciseGroup == null || exerciseGroup.trim().isEmpty()) && !exercise.isEmpty()) {
-                    categories = DataLoader.getExerciseCategories(appContext, exercise);
+                    // Use cached map for performance
+                    String trimmed = exercise.trim();
+                    boolean found = false;
+                    for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+                        if (entry.getKey().equalsIgnoreCase(trimmed)) {
+                            categories = new ArrayList<>(entry.getValue());
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        categories = new ArrayList<>();
+                        categories.add("Other");
+                    }
                 }
                 for (String category : categories) {
                     incrementCount(categoryCounts, category);
@@ -517,8 +537,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         summary.mostLoggedExerciseLabel = formatTopLabel(exerciseCounts, "No exercise data");
         summary.favoriteCategoryLabel = formatTopLabel(categoryCounts, "No category data");
         summary.heaviestSetLabel = formatHeaviestSetLabel(heaviestWeight, heaviestExercise, heaviestReps, heaviestSets);
+        summary.totalVolumeLabel = formatVolumeLabel(summary.totalVolume);
         summary.hasData = summary.totalWorkouts > 0;
         return summary;
+    }
+
+    private String formatVolumeLabel(double totalVolume) {
+        if (totalVolume <= 0) return "0 lbs";
+        if (totalVolume >= 1000000) {
+            return String.format(Locale.US, "%.2fM lbs", totalVolume / 1000000.0);
+        } else if (totalVolume >= 1000) {
+            return String.format(Locale.US, "%.1fK lbs", totalVolume / 1000.0);
+        }
+        return formatWeightText(totalVolume) + " lbs";
     }
 
     private Long getCurrentUserIdOrNull() {
@@ -719,6 +750,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public int totalWorkouts;
         public int totalSets;
         public int totalReps;
+        public double totalVolume;
         public int distinctExercises;
         public int workoutsLast7Days;
         public int workoutsLast30Days;
@@ -729,5 +761,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public String mostLoggedExerciseLabel = "No exercise data";
         public String heaviestSetLabel = "No weighted sets yet";
         public String favoriteCategoryLabel = "No category data";
+        public String totalVolumeLabel = "0 lbs";
     }
 }

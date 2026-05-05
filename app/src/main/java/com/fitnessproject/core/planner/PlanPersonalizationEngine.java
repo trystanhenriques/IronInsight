@@ -43,26 +43,48 @@ public class PlanPersonalizationEngine {
 
         String normalizedNotes = specificNotes.toLowerCase(Locale.US);
         List<PlanDay> personalizedDays = new ArrayList<>();
+        
         for (PlanDay day : template.getDays()) {
-            List<PlanExercise> exercises = new ArrayList<>(day.getExercises());
+            List<PlanExercise> exercises = new ArrayList<>();
+            
+            // Adjust base exercises intensity if keywords match
+            for (PlanExercise baseEx : day.getExercises()) {
+                String reps = baseEx.getRepRange();
+                String effort = baseEx.getEffortNotes();
+                
+                if (normalizedNotes.contains("heavy") || normalizedNotes.contains("strength") || normalizedNotes.contains("power")) {
+                    reps = "5 reps";
+                    effort = "Heavy (RPE 8-9)";
+                } else if (normalizedNotes.contains("light") || normalizedNotes.contains("endurance") || normalizedNotes.contains("pump")) {
+                    reps = "15-20 reps";
+                    effort = "Moderate (RPE 6-7)";
+                }
+                
+                exercises.add(new PlanExercise(baseEx.getExerciseName(), baseEx.getSets(), reps, effort, baseEx.getOptionalNotes()));
+            }
 
+            // Add targeted accessories based on Day Number for variety
+            int dayNum = day.getDayNumber();
+            
             if (mentionsAny(normalizedNotes, PUSH_KEYWORDS)) {
-                maybeAdd(exercises, accessoryForPush(template.getGoalType()));
+                if (dayNum % 2 != 0) maybeAdd(exercises, exercise("Incline DB Press", 3, "10 reps", "Focus on upper chest", "Custom Focus"));
+                else maybeAdd(exercises, exercise("Chest Flys", 3, "15 reps", "Controlled squeeze", "Custom Focus"));
             }
             if (mentionsAny(normalizedNotes, PULL_KEYWORDS)) {
-                maybeAdd(exercises, accessoryForPull(template.getGoalType()));
+                if (dayNum % 2 != 0) maybeAdd(exercises, exercise("Dumbbell Rows", 3, "10 reps", "Pull to hip", "Custom Focus"));
+                else maybeAdd(exercises, exercise("Face Pulls", 3, "15 reps", "Pull to forehead", "Custom Focus"));
             }
             if (mentionsAny(normalizedNotes, LEGS_KEYWORDS)) {
-                maybeAdd(exercises, accessoryForLegs(template.getGoalType()));
+                if (dayNum % 2 != 0) maybeAdd(exercises, exercise("Walking Lunges", 3, "10/side", "Keep torso upright", "Custom Focus"));
+                else maybeAdd(exercises, exercise("Leg Extensions", 3, "15 reps", "Hold at top", "Custom Focus"));
             }
             if (mentionsAny(normalizedNotes, ARMS_KEYWORDS)) {
-                maybeAdd(exercises, accessoryForArms(template.getGoalType()));
+                if (dayNum % 2 != 0) maybeAdd(exercises, exercise("Bicep Curls", 3, "12 reps", "No swinging", "Custom Focus"));
+                else maybeAdd(exercises, exercise("Tricep Pushdowns", 3, "12 reps", "Lock out elbows", "Custom Focus"));
             }
             if (mentionsAny(normalizedNotes, CORE_KEYWORDS)) {
-                maybeAdd(exercises, accessoryForCore(template.getGoalType()));
-            }
-            if (mentionsAny(normalizedNotes, CONDITIONING_KEYWORDS)) {
-                maybeAdd(exercises, accessoryForConditioning(template.getGoalType()));
+                if (dayNum % 2 != 0) maybeAdd(exercises, exercise("Plank", 3, "60s", "Keep glutes tight", "Custom Focus"));
+                else maybeAdd(exercises, exercise("Leg Raises", 3, "15 reps", "Lower slowly", "Custom Focus"));
             }
 
             personalizedDays.add(new PlanDay(day.getDayNumber(), day.getDayName(), day.getFocus(), exercises));
