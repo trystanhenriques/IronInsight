@@ -22,4 +22,12 @@ public class WeeklyPlanService {
         PlanTemplate baseTemplate = templateProvider.getTemplate(goalType, daysPerWeek);
         return personalizationEngine.applySpecificGoalNotes(baseTemplate, specificNotes);
     }
+
+    public PlanTemplate removeExercise(PlanTemplate template, int dayNumber, String exerciseName) {
+        return personalizationEngine.removeExercise(template, dayNumber, exerciseName);
+    }
+
+    public PlanTemplate replaceExercise(PlanTemplate template, int dayNumber, String exerciseToReplace) {
+        return personalizationEngine.replaceExercise(template, dayNumber, exerciseToReplace);
+    }
 }

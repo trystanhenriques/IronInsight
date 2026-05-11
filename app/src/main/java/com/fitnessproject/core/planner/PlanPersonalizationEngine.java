@@ -3,8 +3,10 @@ package com.fitnessproject.core.planner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 public class PlanPersonalizationEngine {
+    private final Random random = new Random();
     private static final String[] PUSH_KEYWORDS = {
             "bench", "chest", "pec", "pecs", "push", "press", "upper body", "upper chest",
             "incline", "chest press", "pec deck"
@@ -101,6 +103,68 @@ public class PlanPersonalizationEngine {
         );
     }
 
+    public PlanTemplate removeExercise(PlanTemplate template, int dayNumber, String exerciseName) {
+        List<PlanDay> updatedDays = new ArrayList<>();
+        for (PlanDay day : template.getDays()) {
+            if (day.getDayNumber() == dayNumber) {
+                List<PlanExercise> updatedExercises = new ArrayList<>();
+                for (PlanExercise ex : day.getExercises()) {
+                    if (!ex.getExerciseName().equalsIgnoreCase(exerciseName)) {
+                        updatedExercises.add(ex);
+                    }
+                }
+                updatedDays.add(new PlanDay(day.getDayNumber(), day.getDayName(), day.getFocus(), updatedExercises));
+            } else {
+                updatedDays.add(day);
+            }
+        }
+        return new PlanTemplate(
+                template.getGoalType(),
+                template.getDaysPerWeek(),
+                template.getSplitName(),
+                template.getDescription(),
+                updatedDays
+        );
+    }
+
+    public PlanTemplate replaceExercise(PlanTemplate template, int dayNumber, String exerciseToReplace) {
+        List<PlanDay> updatedDays = new ArrayList<>();
+        for (PlanDay day : template.getDays()) {
+            if (day.getDayNumber() == dayNumber) {
+                List<PlanExercise> updatedExercises = new ArrayList<>();
+                for (PlanExercise ex : day.getExercises()) {
+                    if (ex.getExerciseName().equalsIgnoreCase(exerciseToReplace)) {
+                        updatedExercises.add(generateReplacement(ex, template.getGoalType()));
+                    } else {
+                        updatedExercises.add(ex);
+                    }
+                }
+                updatedDays.add(new PlanDay(day.getDayNumber(), day.getDayName(), day.getFocus(), updatedExercises));
+            } else {
+                updatedDays.add(day);
+            }
+        }
+        return new PlanTemplate(
+                template.getGoalType(),
+                template.getDaysPerWeek(),
+                template.getSplitName(),
+                template.getDescription(),
+                updatedDays
+        );
+    }
+
+    private PlanExercise generateReplacement(PlanExercise current, GoalType goalType) {
+        String name = current.getExerciseName().toLowerCase(Locale.US);
+        
+        if (mentionsAny(name, PUSH_KEYWORDS)) return accessoryForPush(goalType);
+        if (mentionsAny(name, PULL_KEYWORDS)) return accessoryForPull(goalType);
+        if (mentionsAny(name, LEGS_KEYWORDS)) return accessoryForLegs(goalType);
+        if (mentionsAny(name, ARMS_KEYWORDS)) return accessoryForArms(goalType);
+        if (mentionsAny(name, CORE_KEYWORDS)) return accessoryForCore(goalType);
+        
+        return accessoryForConditioning(goalType);
+    }
+
     private boolean mentionsAny(String notes, String... keywords) {
         for (String keyword : keywords) {
             if (notes.contains(keyword)) {
@@ -120,68 +184,80 @@ public class PlanPersonalizationEngine {
     }
 
     private PlanExercise accessoryForPush(GoalType goalType) {
+        String[] options = {"Chest Fly", "Push-Up", "Machine Chest Press", "Dips", "Incline DB Press", "Lateral Raise"};
+        String name = options[random.nextInt(options.length)];
         switch (goalType) {
             case STRENGTH:
-                return exercise("Chest Fly", 2, "10-12 reps", "Optional last set near failure", "Accessory only");
+                return exercise(name, 3, "8-10 reps", "Controlled tempo", "Replacement");
             case HYPERTROPHY:
-                return exercise("Push-Up", 2, "12-20 reps", "Stop before form breaks", "Accessory only");
+                return exercise(name, 3, "10-12 reps", "Optional last set near failure", "Replacement");
             default:
-                return exercise("Machine Chest Press", 2, "15-20 reps", "Stop 2-3 reps before failure", "Keep rest short");
+                return exercise(name, 3, "15-20 reps", "Stop 2-3 reps before failure", "Keep rest short");
         }
     }
 
     private PlanExercise accessoryForPull(GoalType goalType) {
+        String[] options = {"Face Pull", "Seated Row", "Dumbbell Row", "Lat Pulldown", "Hammer Curl", "Rear Delt Fly"};
+        String name = options[random.nextInt(options.length)];
         switch (goalType) {
             case STRENGTH:
-                return exercise("Face Pull", 2, "12-15 reps", "Stop 1-2 reps before failure", null);
+                return exercise(name, 3, "8-10 reps", "Focus on contraction", "Replacement");
             case HYPERTROPHY:
-                return exercise("Face Pull", 2, "12-15 reps", "Optional last set near failure", "Accessory only");
+                return exercise(name, 3, "10-12 reps", "Optional last set near failure", "Replacement");
             default:
-                return exercise("Seated Row", 2, "15-20 reps", "Stop 2-3 reps before failure", "Keep rest short");
+                return exercise(name, 3, "15-20 reps", "Stop 2-3 reps before failure", "Keep rest short");
         }
     }
 
     private PlanExercise accessoryForLegs(GoalType goalType) {
+        String[] options = {"Walking Lunge", "Leg Extension", "Step-Up", "Leg Press", "Hamstring Curl", "Goblet Squat"};
+        String name = options[random.nextInt(options.length)];
         switch (goalType) {
             case STRENGTH:
-                return exercise("Walking Lunge", 2, "8 reps per leg", "Stop 1-2 reps before failure", null);
+                return exercise(name, 3, "8 reps per leg", "Stay balanced", "Replacement");
             case HYPERTROPHY:
-                return exercise("Leg Extension", 2, "12-15 reps", "Optional last set near failure", "Accessory only");
+                return exercise(name, 3, "12-15 reps", "Optional last set near failure", "Replacement");
             default:
-                return exercise("Step-Up", 2, "12 reps per leg", "Stop 2-3 reps before failure", "Keep rest short");
+                return exercise(name, 3, "15-20 reps", "Stop 2-3 reps before failure", "Keep rest short");
         }
     }
 
     private PlanExercise accessoryForArms(GoalType goalType) {
+        String[] options = {"Hammer Curl", "Cable Curl", "Bicep Curl", "Tricep Pushdown", "Overhead Extension", "Skullcrushers"};
+        String name = options[random.nextInt(options.length)];
         switch (goalType) {
             case STRENGTH:
-                return exercise("Hammer Curl", 2, "8-10 reps", "Stop 1-2 reps before failure", null);
+                return exercise(name, 3, "8-10 reps", "No swinging", "Replacement");
             case HYPERTROPHY:
-                return exercise("Hammer Curl", 2, "10-15 reps", "Optional last set near failure", "Accessory only");
+                return exercise(name, 3, "10-15 reps", "Optional last set near failure", "Replacement");
             default:
-                return exercise("Cable Curl", 2, "15-20 reps", "Stop 2-3 reps before failure", "Keep rest short");
+                return exercise(name, 3, "15-20 reps", "Stop 2-3 reps before failure", "Keep rest short");
         }
     }
 
     private PlanExercise accessoryForCore(GoalType goalType) {
+        String[] options = {"Side Plank", "Hanging Knee Raise", "Plank", "Leg Raise", "Russian Twist", "Deadbug"};
+        String name = options[random.nextInt(options.length)];
         switch (goalType) {
             case STRENGTH:
-                return exercise("Side Plank", 2, "30-45 seconds per side", "Move with control", null);
+                return exercise(name, 3, "30-45 seconds", "Stay tight", "Replacement");
             case HYPERTROPHY:
-                return exercise("Hanging Knee Raise", 2, "10-15 reps", "Move with control", null);
+                return exercise(name, 3, "10-15 reps", "Move with control", "Replacement");
             default:
-                return exercise("Plank", 2, "30-45 seconds", "Move with control", null);
+                return exercise(name, 3, "30-45 seconds", "Focus on breathing", "Replacement");
         }
     }
 
     private PlanExercise accessoryForConditioning(GoalType goalType) {
+        String[] options = {"Easy Bike", "Walk", "Moderate Cardio", "Cardio Intervals", "Rowing", "Jump Rope"};
+        String name = options[random.nextInt(options.length)];
         switch (goalType) {
             case STRENGTH:
-                return exercise("Easy Bike or Walk", 1, "10-15 minutes", "Keep effort easy", "Recovery-focused conditioning");
+                return exercise(name, 1, "10-15 minutes", "Keep effort easy", "Recovery focus");
             case HYPERTROPHY:
-                return exercise("Moderate Cardio", 1, "10-15 minutes", "Easy to moderate pace", "Recovery-focused conditioning");
+                return exercise(name, 1, "10-15 minutes", "Easy to moderate pace", "Recovery focus");
             default:
-                return exercise("Cardio Intervals", 1, "6-8 rounds of 30s harder / 60s easy", "Stay smooth and controlled", null);
+                return exercise(name, 1, "6-8 rounds of intervals", "Stay smooth and controlled", "Conditioning");
         }
     }
 
