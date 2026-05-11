@@ -1,10 +1,11 @@
 package com.fitnessproject.core.planner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PlanDay {
+public class PlanDay implements Serializable {
     private final int dayNumber;
     private final String dayName;
     private final String focus;

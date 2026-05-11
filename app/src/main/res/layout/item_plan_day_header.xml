@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/spacing_large"
+    android:layout_marginBottom="@dimen/spacing_small"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txtDayTitle"
+        style="@style/TextAppearanceFitnessCardTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/fitness_accent_yellow" />
+
+    <TextView
+        android:id="@+id/txtDayFocus"
+        style="@style/TextAppearanceFitnessCaption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/fitness_text_tertiary"
+        android:textStyle="italic" />
+</LinearLayout>

@@ -15,13 +15,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
 import com.fitnessproject.core.planner.GoalType;
-import com.fitnessproject.core.planner.PlanFormatter;
 import com.fitnessproject.core.planner.PlanTemplate;
 import com.fitnessproject.core.planner.WeeklyPlanService;
 
 public class PlanBuilderActivity extends AppCompatActivity {
     private final WeeklyPlanService weeklyPlanService = new WeeklyPlanService();
-    private final PlanFormatter planFormatter = new PlanFormatter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +80,7 @@ public class PlanBuilderActivity extends AppCompatActivity {
 
     private void launchPlanDisplay(PlanTemplate planTemplate) {
         Intent intent = new Intent(this, PlanDisplayActivity.class);
-        intent.putExtra("plan_goal", planTemplate.getGoalType().getDisplayName());
-        intent.putExtra("plan_split", planTemplate.getSplitName());
-        intent.putExtra("plan_description", planTemplate.getDescription());
-        intent.putExtra("plan_text", planFormatter.formatPlan(planTemplate));
+        intent.putExtra("plan_template", planTemplate);
         startActivity(intent);
     }
 

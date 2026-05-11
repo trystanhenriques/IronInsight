@@ -1,6 +1,8 @@
 package com.fitnessproject.core.planner;
 
-public class PlanExercise {
+import java.io.Serializable;
+
+public class PlanExercise implements Serializable {
     private final String exerciseName;
     private final int sets;
     private final String repRange;

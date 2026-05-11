@@ -106,15 +106,12 @@
                 android:text="Built around your goal and available training days."
                 android:textColor="@color/fitness_text_secondary" />
 
-            <TextView
-                android:id="@+id/txtPlanContent"
-                style="@style/TextAppearanceFitnessBody"
+            <LinearLayout
+                android:id="@+id/layoutPlanDays"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_large"
-                android:lineSpacingExtra="@dimen/line_spacing_body"
-                android:textColor="@color/fitness_text_primary"
-                android:textIsSelectable="true" />
+                android:orientation="vertical" />
         </LinearLayout>
 
         <Button

@@ -1,10 +1,11 @@
 package com.fitnessproject.core.planner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PlanTemplate {
+public class PlanTemplate implements Serializable {
     private final GoalType goalType;
     private final int daysPerWeek;
     private final String splitName;
