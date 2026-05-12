@@ -15,18 +15,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
 import com.fitnessproject.core.data.DatabaseHelper;
 import com.fitnessproject.core.data.model.Routine;
+import com.fitnessproject.ui.common.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RoutinesActivity extends AppCompatActivity {
+public class RoutinesActivity extends BaseActivity {
 
     private ListView listRoutines;
     private View emptyStateRoutines;
@@ -66,22 +66,9 @@ public class RoutinesActivity extends AppCompatActivity {
 
         listRoutines.setOnItemClickListener((parent, view, position, id) -> {
             Routine routine = routineList.get(position);
-            StringBuilder sb = new StringBuilder();
-            if (routine.getExercises() != null && !routine.getExercises().isEmpty()) {
-                for (com.fitnessproject.core.data.model.RoutineExercise ex : routine.getExercises()) {
-                    sb.append("• ").append(ex.getExerciseName())
-                      .append(" (").append(ex.getDefaultSets()).append(" sets x ")
-                      .append(ex.getDefaultReps()).append(" reps)\n");
-                }
-            } else {
-                sb.append("No exercises found.");
-            }
-
-            new AlertDialog.Builder(this)
-                    .setTitle(routine.getName())
-                    .setMessage(sb.toString().trim())
-                    .setPositiveButton("Close", null)
-                    .show();
+            Intent intent = new Intent(this, RoutineDetailActivity.class);
+            intent.putExtra("routine_data", routine);
+            startActivity(intent);
         });
     }
 
