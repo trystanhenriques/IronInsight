@@ -17,6 +17,8 @@ import androidx.fragment.app.Fragment;
 
 import com.fitnessproject.R;
 import com.fitnessproject.core.data.DatabaseHelper;
+import com.fitnessproject.core.data.model.UserSession;
+import com.fitnessproject.core.session.SessionManager;
 
 import java.util.Calendar;
 import java.util.List;
@@ -84,11 +86,22 @@ public class HomeFragment extends Fragment {
 
     private void bindStats(DatabaseHelper.UserStatsSummary stats,
                            List<DatabaseHelper.LastSessionEntry> lastSession) {
-        // Time-based greeting
+        // Time-based greeting with personalization
+        UserSession session = SessionManager.getInstance(requireContext()).getCurrentSession();
+        String name = (session != null && !session.isGuest()) ? session.getUsername() : "";
+        
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        if (hour < 12) txtGreeting.setText("Good morning");
-        else if (hour < 17) txtGreeting.setText("Good afternoon");
-        else txtGreeting.setText("Good evening");
+        String greeting;
+        if (hour >= 5 && hour < 12) greeting = "Good morning";
+        else if (hour >= 12 && hour < 17) greeting = "Good afternoon";
+        else if (hour >= 17 && hour < 21) greeting = "Good evening";
+        else greeting = "Good night";
+
+        if (!name.isEmpty()) {
+            txtGreeting.setText(greeting + ", " + name);
+        } else {
+            txtGreeting.setText(greeting);
+        }
 
         // Stat tiles
         txtStatThisWeek.setText(String.valueOf(stats.workoutsLast7Days));
