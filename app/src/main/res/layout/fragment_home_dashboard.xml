@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fitness_bg_navy"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding">
+
+        <!-- Logo: "Iron" white + "Insights" orange -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/header_top_spacing"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:letterSpacing="-0.02"
+                android:text="Iron"
+                android:textColor="@color/fitness_text_primary"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:letterSpacing="-0.02"
+                android:text="Insights"
+                android:textColor="@color/fitness_primary_orange"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Time-based greeting -->
+        <TextView
+            android:id="@+id/txtGreeting"
+            style="@style/TextAppearanceFitnessScreenSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xsmall"
+            android:layout_marginBottom="@dimen/spacing_xlarge"
+            android:text="Good morning" />
+
+        <!-- 3-column stat row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="@dimen/spacing_small"
+                android:layout_weight="1"
+                android:background="@drawable/bg_rounded_card"
+                android:minHeight="@dimen/stat_tile_min_height"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_medium">
+
+                <TextView
+                    android:id="@+id/txtStatWorkouts"
+                    style="@style/TextAppearanceFitnessStatValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/fitness_primary_orange" />
+
+                <TextView
+                    style="@style/TextAppearanceFitnessSectionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xsmall"
+                    android:text="WORKOUTS" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/spacing_xsmall"
+                android:layout_marginEnd="@dimen/spacing_xsmall"
+                android:layout_weight="1"
+                android:background="@drawable/bg_rounded_card"
+                android:minHeight="@dimen/stat_tile_min_height"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_medium">
+
+                <TextView
+                    android:id="@+id/txtStatThisWeek"
+                    style="@style/TextAppearanceFitnessStatValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/fitness_accent_blue" />
+
+                <TextView
+                    style="@style/TextAppearanceFitnessSectionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xsmall"
+                    android:text="THIS WEEK" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/spacing_small"
+                android:layout_weight="1"
+                android:background="@drawable/bg_rounded_card"
+                android:minHeight="@dimen/stat_tile_min_height"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_medium">
+
+                <TextView
+                    android:id="@+id/txtStatVolume"
+                    style="@style/TextAppearanceFitnessStatValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/fitness_accent_green"
+                    android:textSize="20sp" />
+
+                <TextView
+                    style="@style/TextAppearanceFitnessSectionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xsmall"
+                    android:text="VOLUME" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Tier card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:background="@drawable/bg_rounded_card"
+            android:orientation="vertical"
+            android:padding="@dimen/card_padding_large">
+
+            <TextView
+                style="@style/TextAppearanceFitnessCardEyebrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="YOUR TIER" />
+
+            <TextView
+                android:id="@+id/txtTierName"
+                style="@style/TextAppearanceFitnessCardTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xsmall"
+                android:text="Beginner Foundation" />
+
+            <ProgressBar
+                android:id="@+id/progressTier"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginTop="@dimen/spacing_medium"
+                android:layout_marginBottom="@dimen/spacing_small"
+                android:max="5"
+                android:progress="0"
+                android:progressBackgroundTint="@color/fitness_border_blue_gray"
+                android:progressTint="@color/fitness_primary_orange" />
+
+            <TextView
+                android:id="@+id/txtTierProgress"
+                style="@style/TextAppearanceFitnessCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5 workouts to Intermediate" />
+        </LinearLayout>
+
+        <!-- Last session card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:background="@drawable/bg_rounded_card"
+            android:orientation="vertical"
+            android:padding="@dimen/card_padding_large">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextAppearanceFitnessCardEyebrow"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="LAST SESSION" />
+
+                <TextView
+                    android:id="@+id/txtLastSessionDate"
+                    style="@style/TextAppearanceFitnessCardEyebrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/fitness_text_secondary" />
+            </LinearLayout>
+
+            <!-- Dynamically populated exercise rows -->
+            <LinearLayout
+                android:id="@+id/containerLastSession"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_small"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtLastSessionEmpty"
+                    style="@style/TextAppearanceFitnessCaption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xsmall"
+                    android:text="No workouts logged yet" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Highlights card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_xlarge"
+            android:background="@drawable/bg_rounded_card"
+            android:orientation="vertical"
+            android:padding="@dimen/card_padding_large">
+
+            <TextView
+                style="@style/TextAppearanceFitnessCardEyebrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HIGHLIGHTS" />
+
+            <TextView
+                style="@style/TextAppearanceFitnessSectionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_medium"
+                android:text="Heaviest lift" />
+
+            <TextView
+                android:id="@+id/txtHeaviest"
+                style="@style/TextAppearanceFitnessBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xsmall"
+                android:text="—" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/spacing_medium"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                android:background="@color/fitness_divider_soft" />
+
+            <TextView
+                style="@style/TextAppearanceFitnessSectionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Top category" />
+
+            <TextView
+                android:id="@+id/txtFavoriteCategory"
+                style="@style/TextAppearanceFitnessBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xsmall"
+                android:text="—" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
