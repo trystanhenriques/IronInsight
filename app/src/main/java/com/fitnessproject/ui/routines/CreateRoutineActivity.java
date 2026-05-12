@@ -13,20 +13,19 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.fitnessproject.R;
 import com.fitnessproject.core.data.DataLoader;
 import com.fitnessproject.core.data.DatabaseHelper;
 import com.fitnessproject.core.data.model.Routine;
 import com.fitnessproject.core.data.model.RoutineExercise;
+import com.fitnessproject.ui.common.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class CreateRoutineActivity extends AppCompatActivity {
+public class CreateRoutineActivity extends BaseActivity {
 
     private EditText etRoutineName;
     private LinearLayout containerExercises;

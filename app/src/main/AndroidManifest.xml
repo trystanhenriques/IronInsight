@@ -27,6 +27,11 @@
             android:label="Create Routine"
             android:parentActivityName=".ui.routines.RoutinesActivity" />
         <activity
+            android:name=".ui.routines.RoutineDetailActivity"
+            android:exported="false"
+            android:label="Routine Details"
+            android:parentActivityName=".ui.routines.RoutinesActivity" />
+        <activity
             android:name=".ui.progress.ProgressActivity"
             android:exported="false"
             android:label="Progress"
