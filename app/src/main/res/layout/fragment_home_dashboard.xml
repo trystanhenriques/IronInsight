@@ -12,7 +12,7 @@
         android:orientation="vertical"
         android:padding="@dimen/screen_padding">
 
-        <!-- Logo: "Iron" white + "Insights" orange -->
+        <!-- Logo: "Iron" white + "Insight" orange -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed"
                 android:letterSpacing="-0.02"
-                android:text="Insights"
+                android:text="Insight"
                 android:textColor="@color/fitness_primary_orange"
                 android:textSize="36sp"
                 android:textStyle="bold" />
