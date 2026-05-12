@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 public class HomeFragment extends Fragment {
 
     private TextView txtGreeting;
-    private TextView txtStatWorkouts, txtStatThisWeek, txtStatVolume;
+    private TextView txtStatThisWeek, txtStatVolume;
     private TextView txtTierName, txtTierProgress;
     private ProgressBar progressTier;
     private TextView txtLastSessionDate, txtLastSessionEmpty;
@@ -58,7 +58,6 @@ public class HomeFragment extends Fragment {
 
     private void bindViews(View view) {
         txtGreeting = view.findViewById(R.id.txtGreeting);
-        txtStatWorkouts = view.findViewById(R.id.txtStatWorkouts);
         txtStatThisWeek = view.findViewById(R.id.txtStatThisWeek);
         txtStatVolume = view.findViewById(R.id.txtStatVolume);
         txtTierName = view.findViewById(R.id.txtTierName);
@@ -92,7 +91,6 @@ public class HomeFragment extends Fragment {
         else txtGreeting.setText("Good evening");
 
         // Stat tiles
-        txtStatWorkouts.setText(String.valueOf(stats.totalWorkouts));
         txtStatThisWeek.setText(String.valueOf(stats.workoutsLast7Days));
         txtStatVolume.setText(stats.totalVolumeLabel);
 
