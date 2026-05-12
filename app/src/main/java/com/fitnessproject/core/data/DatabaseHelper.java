@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.fitnessproject.core.data.model.Routine;
+import com.fitnessproject.core.data.model.RoutineExercise;
 import com.fitnessproject.core.data.model.UserSession;
 import com.fitnessproject.core.session.SessionManager;
 
@@ -28,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String GROUP_HEADER_PREFIX = "__HEADER__:";
 
     private static final String DATABASE_NAME = "fitness_project.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     public static final String TABLE_WORKOUTS = "workouts";
     public static final String COLUMN_ID = "id";
@@ -39,6 +41,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_USER_ID = "user_id";
     public static final String COLUMN_EXERCISE_GROUP = "exercise_group";
+
+    // Routine constants
+    public static final String TABLE_ROUTINES = "routines";
+    public static final String COLUMN_ROUTINE_ID = "id";
+    public static final String COLUMN_ROUTINE_NAME = "name";
+    public static final String COLUMN_ROUTINE_SOURCE = "source";
+    public static final String COLUMN_ROUTINE_CREATED_AT = "created_at";
+
+    public static final String TABLE_ROUTINE_EXERCISES = "routine_exercises";
+    public static final String COLUMN_RE_ID = "id";
+    public static final String COLUMN_RE_ROUTINE_ID = "routine_id";
+    public static final String COLUMN_RE_EXERCISE_NAME = "exercise_name";
+    public static final String COLUMN_RE_DEFAULT_SETS = "default_sets";
+    public static final String COLUMN_RE_DEFAULT_REPS = "default_reps";
+    public static final String COLUMN_RE_ORDER_INDEX = "order_index";
 
     private final Context appContext;
 
@@ -59,6 +76,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_EXERCISE_GROUP + " TEXT, " +
                 COLUMN_DATE + " DATETIME DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createTable);
+
+        String createTableRoutines = "CREATE TABLE " + TABLE_ROUTINES + " (" +
+                COLUMN_ROUTINE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_ROUTINE_NAME + " TEXT, " +
+                COLUMN_ROUTINE_SOURCE + " TEXT, " +
+                COLUMN_ROUTINE_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP)";
+        db.execSQL(createTableRoutines);
+
+        String createTableRoutineExercises = "CREATE TABLE " + TABLE_ROUTINE_EXERCISES + " (" +
+                COLUMN_RE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_RE_ROUTINE_ID + " INTEGER, " +
+                COLUMN_RE_EXERCISE_NAME + " TEXT, " +
+                COLUMN_RE_DEFAULT_SETS + " INTEGER, " +
+                COLUMN_RE_DEFAULT_REPS + " INTEGER, " +
+                COLUMN_RE_ORDER_INDEX + " INTEGER, " +
+                "FOREIGN KEY(" + COLUMN_RE_ROUTINE_ID + ") REFERENCES " + TABLE_ROUTINES + "(" + COLUMN_ROUTINE_ID + ") ON DELETE CASCADE)";
+        db.execSQL(createTableRoutineExercises);
     }
 
     @Override
@@ -68,6 +102,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 3) {
             db.execSQL("ALTER TABLE " + TABLE_WORKOUTS + " ADD COLUMN " + COLUMN_EXERCISE_GROUP + " TEXT");
+        }
+        if (oldVersion < 4) {
+            String createTableRoutines = "CREATE TABLE IF NOT EXISTS " + TABLE_ROUTINES + " (" +
+                    COLUMN_ROUTINE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_ROUTINE_NAME + " TEXT, " +
+                    COLUMN_ROUTINE_SOURCE + " TEXT, " +
+                    COLUMN_ROUTINE_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP)";
+            db.execSQL(createTableRoutines);
+
+            String createTableRoutineExercises = "CREATE TABLE IF NOT EXISTS " + TABLE_ROUTINE_EXERCISES + " (" +
+                    COLUMN_RE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_RE_ROUTINE_ID + " INTEGER, " +
+                    COLUMN_RE_EXERCISE_NAME + " TEXT, " +
+                    COLUMN_RE_DEFAULT_SETS + " INTEGER, " +
+                    COLUMN_RE_DEFAULT_REPS + " INTEGER, " +
+                    COLUMN_RE_ORDER_INDEX + " INTEGER, " +
+                    "FOREIGN KEY(" + COLUMN_RE_ROUTINE_ID + ") REFERENCES " + TABLE_ROUTINES + "(" + COLUMN_ROUTINE_ID + ") ON DELETE CASCADE)";
+            db.execSQL(createTableRoutineExercises);
         }
     }
 
@@ -780,6 +832,101 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private boolean isSameDay(Calendar c1, Calendar c2) {
         return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)
                 && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    // --- Routine Methods ---
+
+    public long saveRoutine(Routine routine) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_ROUTINE_NAME, routine.getName());
+        values.put(COLUMN_ROUTINE_SOURCE, routine.getSource());
+
+        db.beginTransaction();
+        long routineId = -1;
+        try {
+            routineId = db.insert(TABLE_ROUTINES, null, values);
+            if (routineId != -1 && routine.getExercises() != null) {
+                for (RoutineExercise ex : routine.getExercises()) {
+                    ContentValues exValues = new ContentValues();
+                    exValues.put(COLUMN_RE_ROUTINE_ID, routineId);
+                    exValues.put(COLUMN_RE_EXERCISE_NAME, ex.getExerciseName());
+                    exValues.put(COLUMN_RE_DEFAULT_SETS, ex.getDefaultSets());
+                    exValues.put(COLUMN_RE_DEFAULT_REPS, ex.getDefaultReps());
+                    exValues.put(COLUMN_RE_ORDER_INDEX, ex.getOrderIndex());
+                    db.insert(TABLE_ROUTINE_EXERCISES, null, exValues);
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+        return routineId;
+    }
+
+    public List<Routine> getAllRoutines() {
+        List<Routine> routines = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ROUTINES + " ORDER BY " + COLUMN_ROUTINE_ID + " DESC", null);
+
+        if (c.moveToFirst()) {
+            do {
+                long id = c.getLong(c.getColumnIndexOrThrow(COLUMN_ROUTINE_ID));
+                String name = c.getString(c.getColumnIndexOrThrow(COLUMN_ROUTINE_NAME));
+                String source = c.getString(c.getColumnIndexOrThrow(COLUMN_ROUTINE_SOURCE));
+
+                List<RoutineExercise> exercises = getRoutineExercises(db, id);
+                routines.add(new Routine(id, name, source, exercises));
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+        return routines;
+    }
+
+    public void deleteRoutine(long routineId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_ROUTINE_EXERCISES, COLUMN_RE_ROUTINE_ID + "=?", new String[]{String.valueOf(routineId)});
+            db.delete(TABLE_ROUTINES, COLUMN_ROUTINE_ID + "=?", new String[]{String.valueOf(routineId)});
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    public Routine getRoutineById(long routineId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Routine routine = null;
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ROUTINES + " WHERE " + COLUMN_ROUTINE_ID + "=?", new String[]{String.valueOf(routineId)});
+        if (c.moveToFirst()) {
+            String name = c.getString(c.getColumnIndexOrThrow(COLUMN_ROUTINE_NAME));
+            String source = c.getString(c.getColumnIndexOrThrow(COLUMN_ROUTINE_SOURCE));
+            List<RoutineExercise> exercises = getRoutineExercises(db, routineId);
+            routine = new Routine(routineId, name, source, exercises);
+        }
+        c.close();
+        db.close();
+        return routine;
+    }
+
+    private List<RoutineExercise> getRoutineExercises(SQLiteDatabase db, long routineId) {
+        List<RoutineExercise> exercises = new ArrayList<>();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_ROUTINE_EXERCISES + " WHERE " + COLUMN_RE_ROUTINE_ID + "=? ORDER BY " + COLUMN_RE_ORDER_INDEX + " ASC", new String[]{String.valueOf(routineId)});
+        if (c.moveToFirst()) {
+            do {
+                String name = c.getString(c.getColumnIndexOrThrow(COLUMN_RE_EXERCISE_NAME));
+                int sets = c.getInt(c.getColumnIndexOrThrow(COLUMN_RE_DEFAULT_SETS));
+                int reps = c.getInt(c.getColumnIndexOrThrow(COLUMN_RE_DEFAULT_REPS));
+                int order = c.getInt(c.getColumnIndexOrThrow(COLUMN_RE_ORDER_INDEX));
+                exercises.add(new RoutineExercise(name, sets, reps, order));
+            } while (c.moveToNext());
+        }
+        c.close();
+        return exercises;
     }
 
     public static class LastSessionEntry {
