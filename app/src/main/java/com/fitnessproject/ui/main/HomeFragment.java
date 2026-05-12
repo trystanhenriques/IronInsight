@@ -162,6 +162,7 @@ public class HomeFragment extends Fragment {
 
             TextView txtExercise = new TextView(requireContext());
             txtExercise.setTextAppearance(R.style.TextAppearanceFitnessCardTitle);
+            txtExercise.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
             txtExercise.setText(entry.exercise);
 
             TextView txtDetail = new TextView(requireContext());
