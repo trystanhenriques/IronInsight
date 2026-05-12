@@ -14,11 +14,12 @@ import com.fitnessproject.core.planner.PlanDay;
 import com.fitnessproject.core.planner.PlanExercise;
 import com.fitnessproject.core.planner.PlanTemplate;
 import com.fitnessproject.core.planner.WeeklyPlanService;
+import com.fitnessproject.ui.common.BaseActivity;
 
 import androidx.core.content.ContextCompat;
 import java.util.Locale;
 
-public class PlanDisplayActivity extends AppCompatActivity {
+public class PlanDisplayActivity extends BaseActivity {
     private PlanTemplate currentTemplate;
     private final WeeklyPlanService weeklyPlanService = new WeeklyPlanService();
     private LinearLayout layoutPlanDays;

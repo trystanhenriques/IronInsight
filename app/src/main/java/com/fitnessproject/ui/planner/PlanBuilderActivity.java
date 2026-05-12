@@ -17,8 +17,9 @@ import com.fitnessproject.R;
 import com.fitnessproject.core.planner.GoalType;
 import com.fitnessproject.core.planner.PlanTemplate;
 import com.fitnessproject.core.planner.WeeklyPlanService;
+import com.fitnessproject.ui.common.BaseActivity;
 
-public class PlanBuilderActivity extends AppCompatActivity {
+public class PlanBuilderActivity extends BaseActivity {
     private final WeeklyPlanService weeklyPlanService = new WeeklyPlanService();
 
     @Override

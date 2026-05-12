@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.core.data.DataLoader;
 import com.fitnessproject.core.data.DatabaseHelper;
 import com.fitnessproject.ui.common.GroupedWorkoutListAdapter;
@@ -26,7 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class ProgressActivity extends AppCompatActivity {
+public class ProgressActivity extends BaseActivity {
 
     private static final String CATEGORY_ALL = "All Categories";
 

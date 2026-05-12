@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.ui.main.MainActivity;
 
 /**
@@ -15,7 +16,7 @@ import com.fitnessproject.ui.main.MainActivity;
  * If the user successfully logs in, registers, or chooses guest mode, it ends and pops clear back
  * directly routing straight into MainActivity securely handling offline flow exclusively.
  */
-public class AuthActivity extends AppCompatActivity {
+public class AuthActivity extends BaseActivity {
 
     private AuthViewModel authViewModel;
 
