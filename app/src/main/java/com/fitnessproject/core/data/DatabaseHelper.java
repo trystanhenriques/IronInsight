@@ -9,11 +9,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.fitnessproject.core.data.model.UserSession;
 import com.fitnessproject.core.session.SessionManager;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -484,6 +486,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Map<String, Integer> exerciseCounts = new LinkedHashMap<>();
         Map<String, Integer> categoryCounts = new LinkedHashMap<>();
         Set<String> activeDateKeys = new LinkedHashSet<>();
+        Set<String> totalWorkoutSessionDays = new HashSet<>();
+        Set<String> last7DaysSessionDays = new HashSet<>();
 
         // Optimization: load the category map once
         Map<String, List<String>> categoryMap = DataLoader.getExerciseNameToCategoriesMap(appContext);
@@ -498,8 +502,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                summary.totalWorkouts++;
-
                 String exercise = valueOrEmpty(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_EXERCISE)));
                 String weightRaw = valueOrEmpty(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_WEIGHT)));
                 String repsRaw = valueOrEmpty(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_REPS)));
@@ -509,6 +511,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 Date parsedDate = parseDatabaseDate(dateText);
                 if (parsedDate != null) {
+                    String dayKey = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(parsedDate);
+                    totalWorkoutSessionDays.add(dayKey);
+
                     if (newestWorkoutDate == null || parsedDate.after(newestWorkoutDate)) {
                         newestWorkoutDate = parsedDate;
                     }
@@ -517,13 +522,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     }
 
                     if (isWithinLastDays(parsedDate, now, 7)) {
-                        summary.workoutsLast7Days++;
+                        last7DaysSessionDays.add(dayKey);
                     }
                     if (isWithinLastDays(parsedDate, now, 30)) {
                         summary.workoutsLast30Days++;
                     }
                     if (isSameMonth(parsedDate, now)) {
-                        activeDateKeys.add(new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(parsedDate));
+                        activeDateKeys.add(dayKey);
                     }
                 }
 
@@ -576,6 +581,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
 
+        summary.totalWorkouts = totalWorkoutSessionDays.size();
+        summary.workoutsLast7Days = last7DaysSessionDays.size();
         summary.distinctExercises = exerciseCounts.size();
         summary.activeDaysThisMonth = activeDateKeys.size();
         summary.lastWorkoutDateLabel = newestWorkoutDate == null
@@ -595,12 +602,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private String formatVolumeLabel(double totalVolume) {
         if (totalVolume <= 0) return "0 lbs";
-        if (totalVolume >= 1000000) {
-            return String.format(Locale.US, "%.2fM lbs", totalVolume / 1000000.0);
-        } else if (totalVolume >= 1000) {
-            return String.format(Locale.US, "%.1fK lbs", totalVolume / 1000.0);
-        }
-        return formatWeightText(totalVolume) + " lbs";
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
+        formatter.setMaximumFractionDigits(0);
+        return formatter.format(totalVolume) + " lbs";
     }
 
     private Long getCurrentUserIdOrNull() {
