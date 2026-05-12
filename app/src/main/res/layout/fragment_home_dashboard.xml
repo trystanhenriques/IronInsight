@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xsmall"
             android:layout_marginBottom="@dimen/spacing_xlarge"
-            android:text="Good morning" />
+            android:text="Good Morning" />
 
         <!-- 2-column stat row -->
         <LinearLayout
