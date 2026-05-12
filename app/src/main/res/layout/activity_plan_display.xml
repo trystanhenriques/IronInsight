@@ -122,5 +122,13 @@
             android:layout_marginBottom="@dimen/spacing_large"
             android:text="Back to Builder" />
 
+        <Button
+            android:id="@+id/btnSaveAsRoutine"
+            style="@style/Widget.Fitness.Button.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:text="Save as Routine" />
+
     </LinearLayout>
 </ScrollView>

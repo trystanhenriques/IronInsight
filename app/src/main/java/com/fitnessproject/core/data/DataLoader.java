@@ -35,9 +35,12 @@ public class DataLoader {
     public static List<String> getExerciseNames(Context context) {
         List<String> names = new ArrayList<>();
         try {
-            JSONArray array = new JSONArray(loadJSONFromAsset(context, "exercises.json"));
-            for (int i = 0; i < array.length(); i++) {
-                names.add(array.getJSONObject(i).getString("name"));
+            String json = loadJSONFromAsset(context, "exercises.json");
+            if (json != null) {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    names.add(array.getJSONObject(i).getString("name"));
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -48,13 +51,16 @@ public class DataLoader {
     public static Map<String, List<String>> getExerciseNameToCategoriesMap(Context context) {
         Map<String, List<String>> nameToCategories = new LinkedHashMap<>();
         try {
-            JSONArray array = new JSONArray(loadJSONFromAsset(context, "exercises.json"));
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.getJSONObject(i);
-                String name = obj.getString("name");
-                if (name != null && !name.trim().isEmpty()) {
-                    List<String> categories = extractCategoriesFromJson(obj);
-                    nameToCategories.put(name.trim(), categories);
+            String json = loadJSONFromAsset(context, "exercises.json");
+            if (json != null) {
+                JSONArray array = new JSONArray(json);
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject obj = array.getJSONObject(i);
+                    String name = obj.getString("name");
+                    if (name != null && !name.trim().isEmpty()) {
+                        List<String> categories = extractCategoriesFromJson(obj);
+                        nameToCategories.put(name.trim(), categories);
+                    }
                 }
             }
         } catch (JSONException e) {

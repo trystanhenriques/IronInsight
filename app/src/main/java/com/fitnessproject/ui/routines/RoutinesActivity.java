@@ -63,6 +63,26 @@ public class RoutinesActivity extends AppCompatActivity {
                     .show();
             return true;
         });
+
+        listRoutines.setOnItemClickListener((parent, view, position, id) -> {
+            Routine routine = routineList.get(position);
+            StringBuilder sb = new StringBuilder();
+            if (routine.getExercises() != null && !routine.getExercises().isEmpty()) {
+                for (com.fitnessproject.core.data.model.RoutineExercise ex : routine.getExercises()) {
+                    sb.append("• ").append(ex.getExerciseName())
+                      .append(" (").append(ex.getDefaultSets()).append(" sets x ")
+                      .append(ex.getDefaultReps()).append(" reps)\n");
+                }
+            } else {
+                sb.append("No exercises found.");
+            }
+
+            new AlertDialog.Builder(this)
+                    .setTitle(routine.getName())
+                    .setMessage(sb.toString().trim())
+                    .setPositiveButton("Close", null)
+                    .show();
+        });
     }
 
     @Override

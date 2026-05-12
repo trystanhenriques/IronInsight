@@ -1,15 +1,24 @@
 package com.fitnessproject.ui.planner;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
+import com.fitnessproject.core.data.DatabaseHelper;
+import com.fitnessproject.core.data.model.Routine;
+import com.fitnessproject.core.data.model.RoutineExercise;
 import com.fitnessproject.core.planner.PlanDay;
 import com.fitnessproject.core.planner.PlanExercise;
 import com.fitnessproject.core.planner.PlanTemplate;
@@ -17,17 +26,25 @@ import com.fitnessproject.core.planner.WeeklyPlanService;
 import com.fitnessproject.ui.common.BaseActivity;
 
 import androidx.core.content.ContextCompat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PlanDisplayActivity extends BaseActivity {
     private PlanTemplate currentTemplate;
     private final WeeklyPlanService weeklyPlanService = new WeeklyPlanService();
     private LinearLayout layoutPlanDays;
+    private DatabaseHelper dbHelper;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plan_display);
+        dbHelper = new DatabaseHelper(this);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Weekly Plan");
@@ -43,6 +60,97 @@ public class PlanDisplayActivity extends BaseActivity {
 
         Button btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
+
+        Button btnSaveAsRoutine = findViewById(R.id.btnSaveAsRoutine);
+        btnSaveAsRoutine.setOnClickListener(v -> promptSaveRoutine());
+    }
+
+    private void promptSaveRoutine() {
+        if (currentTemplate == null) return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Save as Routine");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        String defaultName = currentTemplate.getGoalType() != null ? "My " + currentTemplate.getGoalType().getDisplayName() + " Plan" : "My Plan";
+        input.setText(defaultName);
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String name = input.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter a routine name.", Toast.LENGTH_SHORT).show();
+            } else {
+                savePlanAsRoutine(name);
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private int extractFirstNumber(String repRange) {
+        if (repRange == null) return 0;
+        String val = repRange.replaceAll("[^0-9]", " ").trim();
+        if (val.isEmpty()) return 0;
+        String[] parts = val.split("\\s+");
+        try {
+            return Integer.parseInt(parts[0]);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private void savePlanAsRoutine(String routineNamePrefix) {
+        executor.execute(() -> {
+            boolean allSuccess = true;
+            for (PlanDay day : currentTemplate.getDays()) {
+                if (day.getExercises().isEmpty()) continue;
+
+                String dayDescriptor = day.getFocus();
+                if (dayDescriptor == null || dayDescriptor.trim().isEmpty()) {
+                    dayDescriptor = day.getDayName();
+                }
+                String baseName = routineNamePrefix + " - " + dayDescriptor;
+
+                String finalName = baseName;
+                int suffix = 1;
+                while (dbHelper.doesRoutineNameExist(finalName)) {
+                    finalName = baseName + " (" + suffix + ")";
+                    suffix++;
+                }
+
+                List<RoutineExercise> routineExercises = new ArrayList<>();
+                int orderIdx = 0;
+                for (PlanExercise pe : day.getExercises()) {
+                    RoutineExercise re = new RoutineExercise();
+                    re.setExerciseName(pe.getExerciseName());
+                    re.setDefaultSets(pe.getSets());
+                    re.setDefaultReps(extractFirstNumber(pe.getRepRange()));
+                    re.setOrderIndex(orderIdx++);
+                    routineExercises.add(re);
+                }
+
+                Routine routine = new Routine();
+                routine.setName(finalName);
+                routine.setSource("Plan");
+                routine.setExercises(routineExercises);
+
+                long result = dbHelper.saveRoutine(routine);
+                if (result == -1) {
+                    allSuccess = false;
+                }
+            }
+
+            final boolean successFinished = allSuccess;
+            handler.post(() -> {
+                if (successFinished) {
+                    Toast.makeText(PlanDisplayActivity.this, "Routines saved to My Routines!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(PlanDisplayActivity.this, "Failed to save some routines.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     private void updateUi() {

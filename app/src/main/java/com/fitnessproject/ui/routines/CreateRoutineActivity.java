@@ -42,7 +42,7 @@ public class CreateRoutineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_routine);
 
         dbHelper = new DatabaseHelper(this);
-        exerciseNames = DataLoader.getExerciseNames(this);
+        exerciseNames = dbHelper.getAllUniqueExercises(this);
 
         etRoutineName = findViewById(R.id.etRoutineName);
         containerExercises = findViewById(R.id.containerExercises);
@@ -57,16 +57,52 @@ public class CreateRoutineActivity extends AppCompatActivity {
             return;
         }
 
+        List<String> displayList = new ArrayList<>(exerciseNames);
+        displayList.add("Custom Exercise...");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        int padding = getResources().getDimensionPixelSize(R.dimen.spacing_large);
+        layout.setPadding(padding, padding, padding, padding);
+
         Spinner spinner = new Spinner(this);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, exerciseNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, displayList);
         spinner.setAdapter(adapter);
+        layout.addView(spinner);
+
+        EditText etCustom = new EditText(this);
+        etCustom.setHint("Enter custom exercise name");
+        etCustom.setVisibility(View.GONE);
+        etCustom.setPadding(0, padding, 0, 0);
+        layout.addView(etCustom);
+
+        spinner.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                if ("Custom Exercise...".equals(displayList.get(position))) {
+                    etCustom.setVisibility(View.VISIBLE);
+                } else {
+                    etCustom.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
 
         new AlertDialog.Builder(this)
                 .setTitle("Select Exercise")
-                .setView(spinner)
+                .setView(layout)
                 .setPositiveButton("Add", (dialog, which) -> {
                     String selected = (String) spinner.getSelectedItem();
-                    if (selected != null) {
+                    if ("Custom Exercise...".equals(selected)) {
+                        String custom = etCustom.getText().toString().trim();
+                        if (!custom.isEmpty()) {
+                            addExerciseRow(custom);
+                        } else {
+                            Toast.makeText(this, "Please enter a name.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else if (selected != null) {
                         addExerciseRow(selected);
                     }
                 })
@@ -117,11 +153,19 @@ public class CreateRoutineActivity extends AppCompatActivity {
         }
 
         Routine routine = new Routine();
-        routine.setName(name);
+        routine.setName(name); // Temporarily set, will be checked
         routine.setSource("Custom");
         routine.setExercises(exercises);
 
         executor.execute(() -> {
+            String finalName = name;
+            int suffix = 1;
+            while (dbHelper.doesRoutineNameExist(finalName)) {
+                finalName = name + " (" + suffix + ")";
+                suffix++;
+            }
+            routine.setName(finalName);
+
             long id = dbHelper.saveRoutine(routine);
             handler.post(() -> {
                 if (id != -1) {
@@ -134,4 +178,3 @@ public class CreateRoutineActivity extends AppCompatActivity {
         });
     }
 }
-

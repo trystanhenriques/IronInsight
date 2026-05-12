@@ -478,6 +478,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return names;
     }
 
+    public List<String> getAllUniqueExercises(android.content.Context context) {
+        java.util.Set<String> uniqueExercises = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        uniqueExercises.addAll(com.fitnessproject.core.data.DataLoader.getExerciseNames(context));
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Long currentUserId = getCurrentUserIdOrNull();
+        String workoutQuery = currentUserId == null ?
+                "SELECT DISTINCT " + COLUMN_EXERCISE + " FROM " + TABLE_WORKOUTS + " WHERE " + COLUMN_USER_ID + " IS NULL AND " + COLUMN_EXERCISE + " IS NOT NULL" :
+                "SELECT DISTINCT " + COLUMN_EXERCISE + " FROM " + TABLE_WORKOUTS + " WHERE " + COLUMN_USER_ID + " = " + currentUserId + " AND " + COLUMN_EXERCISE + " IS NOT NULL";
+
+        Cursor c1 = db.rawQuery(workoutQuery, null);
+        if (c1 != null) {
+            if (c1.moveToFirst()) {
+                do {
+                    String name = c1.getString(0);
+                    if (name != null) uniqueExercises.add(name.trim());
+                } while (c1.moveToNext());
+            }
+            c1.close();
+        }
+
+        Cursor c2 = db.rawQuery("SELECT DISTINCT " + COLUMN_RE_EXERCISE_NAME + " FROM " + TABLE_ROUTINE_EXERCISES, null);
+        if (c2 != null) {
+            if (c2.moveToFirst()) {
+                do {
+                    String name = c2.getString(0);
+                    if (name != null) uniqueExercises.add(name.trim());
+                } while (c2.moveToNext());
+            }
+            c2.close();
+        }
+
+        List<String> sortedList = new ArrayList<>(uniqueExercises);
+        java.util.Collections.sort(sortedList, String.CASE_INSENSITIVE_ORDER);
+        return sortedList;
+    }
+
     public List<ExerciseGroupEntry> getTrackedExercisesWithGroups() {
         List<ExerciseGroupEntry> entries = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -883,6 +921,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         c.close();
         db.close();
         return routines;
+    }
+
+    public boolean doesRoutineNameExist(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT " + COLUMN_ROUTINE_ID + " FROM " + TABLE_ROUTINES + " WHERE " + COLUMN_ROUTINE_NAME + " = ?", new String[]{name});
+        boolean exists = c.moveToFirst();
+        c.close();
+        db.close();
+        return exists;
     }
 
     public void deleteRoutine(long routineId) {

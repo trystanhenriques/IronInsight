@@ -5,6 +5,8 @@
         <item name="android:textColorPrimary">@color/fitness_text_primary</item>
         <item name="android:textColorSecondary">@color/fitness_text_secondary</item>
         <item name="colorPrimary">@color/fitness_primary_orange</item>
+        <item name="colorTertiary">@color/fitness_primary_orange</item>
+        <item name="colorAccent">@color/fitness_primary_orange</item>
         <item name="colorControlActivated">@color/fitness_primary_orange</item>
         <item name="android:colorControlActivated">@color/fitness_primary_orange</item>
 
@@ -25,6 +27,7 @@
     <!-- Shared Custom UI Styles -->
     <style name="Widget.Fitness.Button.Primary" parent="Widget.Material3.Button">
         <item name="android:background">@drawable/bg_button_primary</item>
+        <item name="backgroundTint">@null</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">@dimen/text_size_body</item>
         <item name="android:textStyle">bold</item>
@@ -34,6 +37,7 @@
 
     <style name="Widget.Fitness.Button.Secondary" parent="Widget.Material3.Button">
         <item name="android:background">@drawable/bg_button_secondary</item>
+        <item name="backgroundTint">@null</item>
         <item name="android:textColor">@color/fitness_text_primary</item>
         <item name="android:textSize">@dimen/text_size_body</item>
         <item name="android:textStyle">bold</item>

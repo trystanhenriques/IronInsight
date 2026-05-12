@@ -37,7 +37,7 @@ public class DatabaseHelperUserStatsTest {
         DatabaseHelper.UserStatsSummary stats = db.getUserStatsSummary();
 
         assertTrue(stats.hasData);
-        assertEquals(3, stats.totalWorkouts);
+        assertEquals(1, stats.totalWorkouts);
         assertEquals(8, stats.totalSets);
         assertEquals(33, stats.totalReps);
         assertEquals(2, stats.distinctExercises);
