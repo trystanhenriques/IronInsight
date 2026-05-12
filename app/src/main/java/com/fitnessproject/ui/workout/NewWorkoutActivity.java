@@ -46,7 +46,8 @@ public class NewWorkoutActivity extends BaseActivity {
         Set<String> selectedCategories = new LinkedHashSet<>();
         selectedCategories.add("Other");
 
-        List<String> exerciseList = new ArrayList<>(DataLoader.getExerciseNames(this));
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        List<String> exerciseList = new ArrayList<>(dbHelper.getAllUniqueExercises(this));
         exerciseList.add(CUSTOM_EXERCISE_OPTION);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_spinner, exerciseList);
         adapter.setDropDownViewResource(R.layout.item_spinner_dropdown);

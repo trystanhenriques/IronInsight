@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_marginBottom="@dimen/spacing_small">
+
+    <TextView
+        android:id="@+id/tvRowExerciseName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Exercise Name"
+        style="@style/TextAppearanceFitnessBody" />
+
+    <EditText
+        android:id="@+id/etRowSets"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:hint="Sets"
+        android:inputType="number"
+        style="@style/Widget.Fitness.EditText"
+        android:layout_marginEnd="@dimen/spacing_small" />
+
+    <EditText
+        android:id="@+id/etRowReps"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:hint="Reps"
+        android:inputType="number"
+        style="@style/Widget.Fitness.EditText"
+        android:layout_marginEnd="@dimen/spacing_small" />
+
+    <ImageButton
+        android:id="@+id/btnRemoveRow"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="Remove exercise"
+        android:src="@android:drawable/ic_delete"
+        android:tint="@color/fitness_text_secondary" />
+
+</LinearLayout>
+

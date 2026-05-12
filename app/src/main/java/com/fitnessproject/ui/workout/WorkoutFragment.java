@@ -14,6 +14,7 @@ import com.fitnessproject.R;
 import com.fitnessproject.ui.history.WorkoutHistoryActivity;
 import com.fitnessproject.ui.progress.ProgressActivity;
 import com.fitnessproject.ui.stats.UserStatsActivity;
+import com.fitnessproject.ui.routines.RoutinesActivity;
 
 public class WorkoutFragment extends Fragment {
 
@@ -39,5 +40,8 @@ public class WorkoutFragment extends Fragment {
 
         view.findViewById(R.id.btnUserStats).setOnClickListener(v ->
                 startActivity(new Intent(requireActivity(), UserStatsActivity.class)));
+
+        view.findViewById(R.id.btnMyRoutines).setOnClickListener(v ->
+                startActivity(new Intent(requireActivity(), RoutinesActivity.class)));
     }
 }

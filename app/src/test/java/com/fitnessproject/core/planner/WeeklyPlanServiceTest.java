@@ -25,7 +25,7 @@ public class WeeklyPlanServiceTest {
 
         assertEquals(3, personalized.getDays().size());
         assertTrue(personalized.getDescription().contains("Specific goal notes"));
-        assertTrue(containsExercise(personalized, "Push-Up") || containsExercise(personalized, "Hammer Curl"));
+        assertTrue(containsExercise(personalized, "Incline DB Press") || containsExercise(personalized, "Bicep Curls"));
     }
 
     @Test

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_rounded_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="@dimen/card_padding_large"
+    android:layout_marginBottom="@dimen/spacing_small">
+
+    <TextView
+        android:id="@+id/tvRoutineName"
+        style="@style/TextAppearanceFitnessCardTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Routine Name" />
+
+    <TextView
+        android:id="@+id/tvRoutineSource"
+        style="@style/TextAppearanceFitnessCaption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_small"
+        android:background="@drawable/bg_icon_container_orange"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:text="Preset"
+        android:textColor="@color/fitness_primary_orange" />
+</LinearLayout>
