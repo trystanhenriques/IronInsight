@@ -339,6 +339,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
+    public List<LastSessionEntry> getLastSessionEntries() {
+        List<LastSessionEntry> entries = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor;
+
+        Long currentUserId = getCurrentUserIdOrNull();
+        String dateSubquery;
+        if (currentUserId == null) {
+            dateSubquery = "(SELECT DATE(MAX(" + COLUMN_DATE + ")) FROM " + TABLE_WORKOUTS
+                    + " WHERE " + COLUMN_USER_ID + " IS NULL)";
+            cursor = db.rawQuery(
+                    "SELECT " + COLUMN_EXERCISE + ", " + COLUMN_WEIGHT + ", "
+                            + COLUMN_REPS + ", " + COLUMN_SETS
+                            + " FROM " + TABLE_WORKOUTS
+                            + " WHERE " + COLUMN_USER_ID + " IS NULL"
+                            + " AND DATE(" + COLUMN_DATE + ") = " + dateSubquery
+                            + " ORDER BY " + COLUMN_ID + " DESC",
+                    null
+            );
+        } else {
+            dateSubquery = "(SELECT DATE(MAX(" + COLUMN_DATE + ")) FROM " + TABLE_WORKOUTS
+                    + " WHERE " + COLUMN_USER_ID + " = ?)";
+            cursor = db.rawQuery(
+                    "SELECT " + COLUMN_EXERCISE + ", " + COLUMN_WEIGHT + ", "
+                            + COLUMN_REPS + ", " + COLUMN_SETS
+                            + " FROM " + TABLE_WORKOUTS
+                            + " WHERE " + COLUMN_USER_ID + " = ?"
+                            + " AND DATE(" + COLUMN_DATE + ") = " + dateSubquery
+                            + " ORDER BY " + COLUMN_ID + " DESC",
+                    new String[]{String.valueOf(currentUserId), String.valueOf(currentUserId)}
+            );
+        }
+
+        if (cursor.moveToFirst()) {
+            do {
+                String exercise = cursor.getString(0);
+                if (exercise != null && !exercise.trim().isEmpty()) {
+                    entries.add(new LastSessionEntry(
+                            exercise.trim(),
+                            cursor.getString(1),
+                            cursor.getString(2),
+                            cursor.getString(3)
+                    ));
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return entries;
+    }
+
     public List<String> getTrackedExerciseNames() {
         List<String> names = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -725,6 +776,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private boolean isSameDay(Calendar c1, Calendar c2) {
         return c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR)
                 && c1.get(Calendar.DAY_OF_YEAR) == c2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    public static class LastSessionEntry {
+        public final String exercise;
+        public final String weight;
+        public final String reps;
+        public final String sets;
+
+        public LastSessionEntry(String exercise, String weight, String reps, String sets) {
+            this.exercise = exercise;
+            this.weight = weight;
+            this.reps = reps;
+            this.sets = sets;
+        }
     }
 
     public static class ExerciseGroupEntry {
