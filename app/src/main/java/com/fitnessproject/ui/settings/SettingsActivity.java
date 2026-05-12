@@ -14,12 +14,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.core.data.DatabaseHelper;
 import com.fitnessproject.core.data.model.UserSession;
 import com.fitnessproject.core.session.SessionManager;
+import com.fitnessproject.core.util.PreferenceUtils;
 import com.fitnessproject.ui.auth.AuthActivity;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
     private static final String PREFS_NAME = "FitnessPrefs";
     private static final String KEY_DISCLAIMER_ACCEPTED = "disclaimer_accepted";
@@ -41,8 +43,8 @@ public class SettingsActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this, new SettingsViewModelFactory(this)).get(SettingsViewModel.class);
 
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String scopedDisclaimerKey = getScopedKey(KEY_DISCLAIMER_ACCEPTED);
-        String scopedTextSizeKey = getScopedKey(KEY_TEXT_SIZE);
+        String scopedDisclaimerKey = PreferenceUtils.getScopedKey(this, KEY_DISCLAIMER_ACCEPTED);
+        String scopedTextSizeKey = PreferenceUtils.getScopedKey(this, KEY_TEXT_SIZE);
 
         // Account UI Bindings
         TextView txtAccountStatus = findViewById(R.id.txtAccountStatus);
@@ -90,7 +92,9 @@ public class SettingsActivity extends AppCompatActivity {
             if (checkedId == R.id.rbSmall) size = 0;
             else if (checkedId == R.id.rbLarge) size = 2;
             prefs.edit().putInt(scopedTextSizeKey, size).apply();
-            Toast.makeText(this, "Text size preference saved. Restart app to apply fully.", Toast.LENGTH_SHORT).show();
+            
+            Toast.makeText(this, "Text size saved. Re-opening app to apply.", Toast.LENGTH_SHORT).show();
+            recreate();
         });
 
         // Delete History
@@ -115,11 +119,4 @@ public class SettingsActivity extends AppCompatActivity {
         return true;
     }
 
-    private String getScopedKey(String baseKey) {
-        UserSession session = SessionManager.getInstance(this).getCurrentSession();
-        if (session != null && !session.isGuest() && session.getUserId() != null) {
-            return baseKey + "_user_" + session.getUserId();
-        }
-        return baseKey + "_guest";
-    }
 }

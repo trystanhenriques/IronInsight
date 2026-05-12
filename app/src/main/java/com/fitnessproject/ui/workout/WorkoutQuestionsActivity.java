@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.core.engine.FormCheckEngine;
 import com.fitnessproject.core.model.Answer;
 import com.fitnessproject.core.model.EvaluationResult;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class WorkoutQuestionsActivity extends AppCompatActivity {
+public class WorkoutQuestionsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

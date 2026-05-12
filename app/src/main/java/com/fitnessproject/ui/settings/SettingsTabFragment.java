@@ -23,6 +23,7 @@ import com.fitnessproject.R;
 import com.fitnessproject.core.data.DatabaseHelper;
 import com.fitnessproject.core.data.model.UserSession;
 import com.fitnessproject.core.session.SessionManager;
+import com.fitnessproject.core.util.PreferenceUtils;
 import com.fitnessproject.ui.auth.AuthActivity;
 
 public class SettingsTabFragment extends Fragment {
@@ -49,8 +50,8 @@ public class SettingsTabFragment extends Fragment {
 
         SharedPreferences prefs = requireContext()
                 .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        String scopedDisclaimerKey = getScopedKey(KEY_DISCLAIMER_ACCEPTED);
-        String scopedTextSizeKey = getScopedKey(KEY_TEXT_SIZE);
+        String scopedDisclaimerKey = PreferenceUtils.getScopedKey(requireContext(), KEY_DISCLAIMER_ACCEPTED);
+        String scopedTextSizeKey = PreferenceUtils.getScopedKey(requireContext(), KEY_TEXT_SIZE);
 
         // Account section
         TextView txtAccountStatus = view.findViewById(R.id.txtAccountStatus);
@@ -95,8 +96,14 @@ public class SettingsTabFragment extends Fragment {
             if (checkedId == R.id.rbSmall) size = 0;
             else if (checkedId == R.id.rbLarge) size = 2;
             prefs.edit().putInt(scopedTextSizeKey, size).apply();
+            
             Toast.makeText(requireContext(),
-                    "Text size saved. Restart the app to apply fully.", Toast.LENGTH_SHORT).show();
+                    "Text size saved. Re-opening app to apply.", Toast.LENGTH_SHORT).show();
+            
+            // Re-trigger the activity to show changes immediately if possible
+            if (getActivity() != null) {
+                getActivity().recreate();
+            }
         });
 
         // Delete history
@@ -113,11 +120,4 @@ public class SettingsTabFragment extends Fragment {
                         .show());
     }
 
-    private String getScopedKey(String baseKey) {
-        UserSession session = SessionManager.getInstance(requireContext()).getCurrentSession();
-        if (session != null && !session.isGuest() && session.getUserId() != null) {
-            return baseKey + "_user_" + session.getUserId();
-        }
-        return baseKey + "_guest";
-    }
 }

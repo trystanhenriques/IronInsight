@@ -8,12 +8,13 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.core.data.DatabaseHelper;
 import com.fitnessproject.ui.common.GroupedWorkoutListAdapter;
 
 import java.util.List;
 
-public class WorkoutHistoryActivity extends AppCompatActivity {
+public class WorkoutHistoryActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -2,18 +2,18 @@ package com.fitnessproject.ui.main;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.ui.formcheck.FormCheckFragment;
 import com.fitnessproject.ui.planner.PlanFragment;
 import com.fitnessproject.ui.settings.SettingsTabFragment;
 import com.fitnessproject.ui.workout.WorkoutFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private HomeFragment homeFragment;
     private FormCheckFragment formCheckFragment;

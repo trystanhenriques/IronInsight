@@ -10,11 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
 import com.fitnessproject.core.data.DataLoader;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.ui.workout.WorkoutQuestionsActivity;
 
 import java.util.List;
 
-public class FormCheckStartActivity extends AppCompatActivity {
+public class FormCheckStartActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

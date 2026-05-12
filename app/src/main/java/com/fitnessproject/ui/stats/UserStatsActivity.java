@@ -12,11 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
 import com.fitnessproject.core.data.DatabaseHelper;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.ui.workout.NewWorkoutActivity;
 
 import java.util.Locale;
 
-public class UserStatsActivity extends AppCompatActivity {
+public class UserStatsActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

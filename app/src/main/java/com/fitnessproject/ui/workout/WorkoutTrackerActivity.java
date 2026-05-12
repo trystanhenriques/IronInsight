@@ -8,11 +8,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.ui.history.WorkoutHistoryActivity;
 import com.fitnessproject.ui.progress.ProgressActivity;
 import com.fitnessproject.ui.stats.UserStatsActivity;
 
-public class WorkoutTrackerActivity extends AppCompatActivity {
+public class WorkoutTrackerActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

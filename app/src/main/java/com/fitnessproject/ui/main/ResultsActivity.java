@@ -12,6 +12,7 @@ import com.fitnessproject.ui.formcheck.FormCheckStartActivity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fitnessproject.R;
+import com.fitnessproject.ui.common.BaseActivity;
 
 import com.fitnessproject.core.data.DatabaseHelper;
 import com.fitnessproject.core.data.DataLoader;
@@ -21,7 +22,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ResultsActivity extends AppCompatActivity {
+public class ResultsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

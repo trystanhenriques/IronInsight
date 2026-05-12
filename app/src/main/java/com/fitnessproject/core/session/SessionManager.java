@@ -24,7 +24,12 @@ public class SessionManager {
     private static volatile SessionManager instance;
 
     private SessionManager(Context context) {
-        prefs = context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        Context appContext = context.getApplicationContext();
+        if (appContext != null) {
+            prefs = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        } else {
+            prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        }
     }
 
     public static SessionManager getInstance(Context context) {

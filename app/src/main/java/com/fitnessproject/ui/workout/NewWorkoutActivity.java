@@ -16,13 +16,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.fitnessproject.R;
 import com.fitnessproject.core.data.DataLoader;
 import com.fitnessproject.core.data.DatabaseHelper;
+import com.fitnessproject.ui.common.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class NewWorkoutActivity extends AppCompatActivity {
+public class NewWorkoutActivity extends BaseActivity {
 
     private static final String CUSTOM_EXERCISE_OPTION = "Custom Exercise...";
 
