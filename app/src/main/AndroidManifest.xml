@@ -17,6 +17,16 @@
             android:label="Your Stats"
             android:parentActivityName=".ui.workout.WorkoutTrackerActivity" />
         <activity
+            android:name=".ui.routines.RoutinesActivity"
+            android:exported="false"
+            android:label="My Routines"
+            android:parentActivityName=".ui.workout.WorkoutTrackerActivity" />
+        <activity
+            android:name=".ui.routines.CreateRoutineActivity"
+            android:exported="false"
+            android:label="Create Routine"
+            android:parentActivityName=".ui.routines.RoutinesActivity" />
+        <activity
             android:name=".ui.progress.ProgressActivity"
             android:exported="false"
             android:label="Progress"
