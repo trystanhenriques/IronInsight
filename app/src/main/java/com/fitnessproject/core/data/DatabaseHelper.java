@@ -642,7 +642,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
 
                 if (weight > 0 && reps > 0 && sets > 0) {
-                    summary.totalVolume += (weight * reps * sets);
+                    double sessionVolume = (weight * reps * sets);
+                    summary.totalVolume += sessionVolume;
+                    if (parsedDate != null && isWithinLastDays(parsedDate, now, 7)) {
+                        summary.weeklyVolume += sessionVolume;
+                    }
                 }
 
                 List<String> categories = DataLoader.parseCategoryCsv(exerciseGroup);
@@ -686,6 +690,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         summary.favoriteCategoryLabel = formatTopLabel(categoryCounts, "No category data");
         summary.heaviestSetLabel = formatHeaviestSetLabel(heaviestWeight, heaviestExercise, heaviestReps, heaviestSets);
         summary.totalVolumeLabel = formatVolumeLabel(summary.totalVolume);
+        summary.weeklyVolumeLabel = formatVolumeLabel(summary.weeklyVolume);
         summary.hasData = summary.totalWorkouts > 0;
         return summary;
     }
@@ -695,6 +700,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
         formatter.setMaximumFractionDigits(0);
         return formatter.format(totalVolume) + " lbs";
+    }
+
+    public Map<String, Double> getWeeklyVolumeBreakdown() {
+        Map<String, Double> breakdown = new LinkedHashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor;
+
+        Long currentUserId = getCurrentUserIdOrNull();
+        if (currentUserId == null) {
+            cursor = db.rawQuery(
+                    "SELECT date, weight, reps, sets FROM " + TABLE_WORKOUTS + " WHERE " + COLUMN_USER_ID + " IS NULL ORDER BY date ASC",
+                    null
+            );
+        } else {
+            cursor = db.rawQuery(
+                    "SELECT date, weight, reps, sets FROM " + TABLE_WORKOUTS + " WHERE " + COLUMN_USER_ID + " = ? ORDER BY date ASC",
+                    new String[]{String.valueOf(currentUserId)}
+            );
+        }
+
+        Calendar now = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("EEE", Locale.US);
+        
+        // Initialize map with last 7 days
+        for (int i = 6; i >= 0; i--) {
+            Calendar day = (Calendar) now.clone();
+            day.add(Calendar.DAY_OF_YEAR, -i);
+            breakdown.put(df.format(day.getTime()), 0.0);
+        }
+
+        if (cursor.moveToFirst()) {
+            do {
+                String dateText = cursor.getString(0);
+                Date parsedDate = parseDatabaseDate(dateText);
+                if (parsedDate != null && isWithinLastDays(parsedDate, now, 7)) {
+                    double weight = parseDoubleSafely(cursor.getString(1));
+                    int reps = parseIntegerSafely(cursor.getString(2));
+                    int sets = parseIntegerSafely(cursor.getString(3));
+                    
+                    if (weight > 0 && reps > 0 && sets > 0) {
+                        String dayName = df.format(parsedDate);
+                        double currentVal = breakdown.containsKey(dayName) ? breakdown.get(dayName) : 0.0;
+                        breakdown.put(dayName, currentVal + (weight * reps * sets));
+                    }
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return breakdown;
     }
 
     private Long getCurrentUserIdOrNull() {
@@ -1014,6 +1069,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public int totalSets;
         public int totalReps;
         public double totalVolume;
+        public double weeklyVolume;
         public int distinctExercises;
         public int workoutsLast7Days;
         public int workoutsLast30Days;
@@ -1025,5 +1081,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public String heaviestSetLabel = "No weighted sets yet";
         public String favoriteCategoryLabel = "No category data";
         public String totalVolumeLabel = "0 lbs";
+        public String weeklyVolumeLabel = "0 lbs";
     }
 }

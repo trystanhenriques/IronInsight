@@ -22,6 +22,7 @@ import com.fitnessproject.core.session.SessionManager;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,6 +30,7 @@ public class HomeFragment extends Fragment {
 
     private TextView txtGreeting;
     private TextView txtStatThisWeek, txtStatVolume;
+    private View cardStatVolume;
     private TextView txtTierName, txtTierProgress;
     private ProgressBar progressTier;
     private TextView txtLastSessionDate, txtLastSessionEmpty;
@@ -62,6 +64,7 @@ public class HomeFragment extends Fragment {
         txtGreeting = view.findViewById(R.id.txtGreeting);
         txtStatThisWeek = view.findViewById(R.id.txtStatThisWeek);
         txtStatVolume = view.findViewById(R.id.txtStatVolume);
+        cardStatVolume = view.findViewById(R.id.cardStatVolume);
         txtTierName = view.findViewById(R.id.txtTierName);
         txtTierProgress = view.findViewById(R.id.txtTierProgress);
         progressTier = view.findViewById(R.id.progressTier);
@@ -105,7 +108,9 @@ public class HomeFragment extends Fragment {
 
         // Stat tiles
         txtStatThisWeek.setText(String.valueOf(stats.workoutsLast7Days));
-        txtStatVolume.setText(stats.totalVolumeLabel);
+        txtStatVolume.setText(stats.weeklyVolumeLabel);
+        
+        cardStatVolume.setOnClickListener(v -> showVolumeBreakdown());
 
         // Tier
         bindTier(stats.totalWorkouts);
@@ -188,6 +193,35 @@ public class HomeFragment extends Fragment {
             containerLastSession.addView(txtExercise);
             containerLastSession.addView(txtDetail);
         }
+    }
+
+    private void showVolumeBreakdown() {
+        Context appCtx = requireContext().getApplicationContext();
+        executor.execute(() -> {
+            DatabaseHelper db = new DatabaseHelper(appCtx);
+            Map<String, Double> breakdown = db.getWeeklyVolumeBreakdown();
+            mainHandler.post(() -> {
+                if (isAdded()) {
+                    displayBreakdownDialog(breakdown);
+                }
+            });
+        });
+    }
+
+    private void displayBreakdownDialog(Map<String, Double> breakdown) {
+        StringBuilder sb = new StringBuilder();
+        java.text.NumberFormat nf = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US);
+        
+        for (Map.Entry<String, Double> entry : breakdown.entrySet()) {
+            sb.append(entry.getKey()).append(": ")
+              .append(nf.format(entry.getValue())).append(" lbs\n");
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Weekly Volume Breakdown")
+                .setMessage(sb.toString().trim())
+                .setPositiveButton("Close", null)
+                .show();
     }
 
     private String formatSetDetail(DatabaseHelper.LastSessionEntry entry) {
