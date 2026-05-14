@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.fitnessproject.R;
+import com.fitnessproject.core.util.PreferenceUtils;
 import com.fitnessproject.ui.common.BaseActivity;
 import com.fitnessproject.ui.formcheck.FormCheckFragment;
 import com.fitnessproject.ui.planner.PlanFragment;
